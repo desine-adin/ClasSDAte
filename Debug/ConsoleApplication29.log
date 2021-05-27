@@ -1,0 +1,6 @@
+﻿  ConsoleApplication29.cpp
+c:\users\user\source\repos\consoleapplication29\consoleapplication29\dateclass.h(35): warning C4715: CreateDayOfWeekId: значение возвращается не при всех путях выполнения
+c:\users\user\source\repos\consoleapplication29\consoleapplication29\dateclass.h(53): warning C4715: CreateDayOfWeek: значение возвращается не при всех путях выполнения
+c:\users\user\source\repos\consoleapplication29\consoleapplication29\dateclass.h(123): warning C4715: CreateMonth: значение возвращается не при всех путях выполнения
+c:\users\user\source\repos\consoleapplication29\consoleapplication29\dateclass.h(151): warning C4715: CreateStringFromMonth: значение возвращается не при всех путях выполнения
+  ConsoleApplication29.vcxproj -> C:\Users\User\source\repos\ConsoleApplication29\Debug\ConsoleApplication29.exe
