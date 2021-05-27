@@ -15,6 +15,20 @@ enum class DayOfWeek {
 	Saturday,
 	Sunday
 };
+enum class Months {
+	January,
+	February,
+	March,
+	April,
+	May,
+	June,
+	July,
+	August,
+	September,
+	October,
+	November,
+	December
+};
 int CreateDayOfWeekId(DayOfWeek temp) {
 	switch (temp) {
 	case DayOfWeek::Monday:
@@ -51,21 +65,6 @@ DayOfWeek CreateDayOfWeek(int temp) {
 		return DayOfWeek::Sunday;
 	}
 }
-
-enum class Months {
-	January,
-	February,
-	March,
-	April,
-	May,
-	June,
-	July,
-	August,
-	September,
-	October,
-	November,
-	December
-};
 std::ostream& operator<< (std::ostream &out, const DayOfWeek &temp)
 {
 	switch (temp) {
@@ -154,7 +153,9 @@ private:
 	int number;
 	Months month;
 public:
+	// В конструкторе при некорректных датах будем сбрасывать дату на 1 января
 	Date(Months month_ = Months::January, int number_ = 1) {
+		bool MistakeIndicator{ false };
 		try {
 			switch (month_) {
 			case Months::January:
@@ -223,17 +224,25 @@ public:
 		}
 		catch (int MistakeIndex)
 		{
+			MistakeIndicator = true;
 			if (MistakeIndex == -1) {
-				std::cerr << "Incorrect day" << '\n';
+				std::cerr << "Incorrect day. The created date was initialized on January 1st" << '\n';
 			}
 			else if (MistakeIndex == -2) {
-				std::cerr << "Incorrect month" << '\n';
+				std::cerr << "Incorrect month.  The created date was initialized on January 1st" << '\n';
 			}
 		}
-		month = month_;
-		number = number_;
+		if (MistakeIndicator) {
+			month = Months::January;
+			number = 1;
+		}
+		else {
+			month = month_;
+			number = number_;
+		}
 	}
-	Date(int month_ = 1, int number_ = 1) {
+	Date(int month_, int number_) {
+		bool MistakeIndicator{ false };
 		try {
 			switch (month_) {
 			case 1:
@@ -302,21 +311,28 @@ public:
 		}
 		catch (int MistakeIndex)
 		{
+			MistakeIndicator = true;
 			if (MistakeIndex == -1) {
-				std::cerr << "Incorrect day" << '\n';
+				std::cerr << "Incorrect day. The created date was initialized on January 1st" << '\n';
 			}
 			else if (MistakeIndex == -2) {
-				std::cerr << "Incorrect month" << '\n';
+				std::cerr << "Incorrect month. The created date was initialized on January 1st" << '\n';
 			}
 		}
-		month = CreateMonth(month_);
-		number = number_;
+		if (MistakeIndicator) {
+			month = Months::January;
+			number = 1;
+		}
+		else {
+			month = CreateMonth(month_);
+			number = number_;
+		}
 	}
 	~Date() {
 
 	}
 	Date NextDay() {
-		Date* next;
+		Date* next = nullptr;
 		switch (month) {
 		case Months::January:
 			if (number == 31) {
@@ -407,24 +423,37 @@ public:
 			}
 			break;
 		case Months::December:
-			if (number == 31) {
-				std::cout << "incorrect date";
+			try {
+				if (number == 31) {
+					throw - 1;
+				}
+				else {
+					next = new Date(month, number + 1);
+				}
 			}
-			else {
-				next = new Date(month, number + 1);
+			catch (int) {
+				std::cerr << "Incorrect day. The created date was initialized on January 1st" << '\n';
+				next = new Date;
 			}
 			break;
 		}
+		return *next;
 	}
 	Date PreviousDay() {
-		Date* prev;
+		Date* prev = nullptr;
 		switch (month) {
 		case Months::January:
-			if (number == 1) {
-				std::cout << "incorrect day";
+			try {
+				if (number == 1) {
+					throw - 1;
+				}
+				else {
+					prev = new Date(month, number - 1);
+				}
 			}
-			else {
-				prev = new Date(month, number - 1);
+			catch (int) {
+				std::cerr << "Incorrect day. The created date was initialized on January 1st" << '\n';
+				prev = new Date;
 			}
 			break;
 		case Months::February:
@@ -516,6 +545,7 @@ public:
 			}
 			break;
 		}
+		return *prev;
 	}
 	DayOfWeek FindDayOfWeek(DayOfWeek FirstDay) {
 		int MonthsId = CreateDayOfWeekId(FirstDay);
@@ -580,9 +610,10 @@ public:
 		}
 		return CreateDayOfWeek(MonthsId % 7);
 	}
-	friend std::ostream& operator<< (std::ostream &out, const Date &date);
-	friend std::istream& operator>> (std::istream &in, Date &date);
+	friend std::ostream& operator<< (std::ostream &out, const Date &date); // Перегрузка оператора вывода
+	friend std::istream& operator>> (std::istream &in, Date &date); // Перегрузка оператора ввода
 };
+
 std::ostream& operator<< (std::ostream &out, const Date &date)
 {
 	out << "Month: " << CreateStringFromMonth(date.month) << ", " << "Day: " << date.number;
